@@ -51,7 +51,7 @@ char const * kId = "id";
 char const * kStyle = "s";
 char const * kBackUrl = "backurl";
 char const * kVersion = "v";
-char const * kAppName = "appname";
+char const * kAppTitle = "apptitle";
 char const * kBalloonAction = "balloonaction";
 }  // namespace map
 
@@ -207,6 +207,10 @@ bool ParsedMapApi::Parse(url::Url const & url, UrlType type)
     }
     case UrlType::Crosshair:
     {
+      url.ForEachParam([this](auto const & key, auto const & value)
+      {
+         ParseCrosshairParam(key, value);
+      });
       return true;
     }
   }
@@ -284,7 +288,7 @@ void ParsedMapApi::ParseMapParam(std::string const & key, std::string const & va
     if (!strings::to_int(value, m_version))
       m_version = 0;
   }
-  else if (key == kAppName)
+  else if (key == kAppTitle)
   {
     m_appTitle = value;
   }
@@ -363,6 +367,16 @@ void ParsedMapApi::ParseSearchParam(std::string const & key, std::string const &
     request.m_isSearchOnMap = true;
   }
 }
+
+
+void ParsedMapApi::ParseCrosshairParam(std::string const & key, std::string const & value)
+{
+  if (key == map::kAppTitle)
+  {
+    m_appTitle = value;
+  }
+}
+
 
 void ParsedMapApi::Reset()
 {

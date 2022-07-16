@@ -96,6 +96,7 @@ private:
                        std::vector<std::string> & pattern);
   void ParseSearchParam(std::string const & key, std::string const & value,
                         SearchRequest & request) const;
+  void ParseCrosshairParam(std::string const & key, std::string const & value);
 
   BookmarkManager * m_bmManager = nullptr;
   std::vector<RoutePoint> m_routePoints;
