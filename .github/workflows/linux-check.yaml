@@ -16,6 +16,7 @@ on:
       - packaging/**
       - pyhelpers/**
       - tools/**
+      - '!tools/python/run_desktop_tests.py'
       - xcode/**
 
 jobs:

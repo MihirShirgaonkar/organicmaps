@@ -3,8 +3,9 @@ on:
   workflow_dispatch: # Manual trigger
   pull_request:
     paths:
-      - data/strings/strings.txt
-      - data/strings/types_strings.txt
+      - data/countries_names.txt
+      - data/strings/*
+      - tools/python/strings_utils.py
 
 jobs:
   validate-translation-strings:

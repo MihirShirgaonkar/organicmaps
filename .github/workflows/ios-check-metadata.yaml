@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - iphone/metadata/**
+      - tools/python/check_store_metadata.py
 
 jobs:
   ios-check-metadata:

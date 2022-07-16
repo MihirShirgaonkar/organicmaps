@@ -5,6 +5,7 @@ on:
     paths:
       - android/src/fdroid/**
       - android/src/google/**
+      - tools/python/check_store_metadata.py
 
 jobs:
   android-check-metadata:
