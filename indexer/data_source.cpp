@@ -17,7 +17,7 @@ namespace
 class ReadMWMFunctor
 {
 public:
-  using Fn = function<void(uint32_t, FeatureSource & src)>;
+  using Fn = std::function<void(uint32_t, FeatureSource & src)>;
 
   ReadMWMFunctor(FeatureSourceFactory const & factory, Fn const & fn) : m_factory(factory), m_fn(fn)
   {
@@ -83,7 +83,7 @@ private:
 
 void ReadFeatureType(std::function<void(FeatureType &)> const & fn, FeatureSource & src, uint32_t index)
 {
-  unique_ptr<FeatureType> ft;
+  std::unique_ptr<FeatureType> ft;
   switch (src.GetFeatureStatus(index))
   {
   case FeatureStatus::Deleted:
@@ -109,7 +109,7 @@ void ReadFeatureType(std::function<void(FeatureType &)> const & fn, FeatureSourc
 std::string FeaturesLoaderGuard::GetCountryFileName() const
 {
   if (!m_handle.IsAlive())
-    return string();
+    return {};
 
   return m_handle.GetValue()->GetCountryFileName();
 }
@@ -164,7 +164,7 @@ std::unique_ptr<MwmInfo> DataSource::CreateInfo(platform::LocalCountryFile const
   if (!h.IsMWMSuitable())
     return nullptr;
 
-  auto info = make_unique<MwmInfoEx>();
+  auto info = std::make_unique<MwmInfoEx>();
   info->m_bordersRect = h.GetBounds();
 
   auto const scaleR = h.GetScaleRange();
@@ -180,7 +180,7 @@ std::unique_ptr<MwmValue> DataSource::CreateValue(MwmInfo & info) const
 {
   // Create a section with rank table if it does not exist.
   platform::LocalCountryFile const & localFile = info.GetLocalFile();
-  auto p = make_unique<MwmValue>(localFile);
+  auto p = std::make_unique<MwmValue>(localFile);
   if (!p || version::GetMwmType(p->GetMwmVersion()) != version::MwmType::SingleMwm)
     return nullptr;
 
@@ -199,14 +199,14 @@ bool DataSource::DeregisterMap(CountryFile const & countryFile) { return Deregis
 void DataSource::ForEachInIntervals(ReaderCallback const & fn, covering::CoveringMode mode,
                                     m2::RectD const & rect, int scale) const
 {
-  vector<shared_ptr<MwmInfo>> mwms;
+  std::vector<std::shared_ptr<MwmInfo>> mwms;
   GetMwmsInfo(mwms);
 
   covering::CoveringGetter cov(rect, mode);
 
   MwmId worldID[2];
 
-  for (shared_ptr<MwmInfo> const & info : mwms)
+  for (auto const & info : mwms)
   {
     if (info->m_minScale <= scale && scale <= info->m_maxScale &&
         rect.IsIntersect(info->m_bordersRect))
@@ -309,7 +309,7 @@ void DataSource::ReadFeatures(FeatureCallback const & fn, std::vector<FeatureID>
         ASSERT_NOT_EQUAL(
             FeatureStatus::Deleted, fts,
             ("Deleted feature was cached. It should not be here. Please review your code."));
-        unique_ptr<FeatureType> ft;
+        std::unique_ptr<FeatureType> ft;
         if (fts == FeatureStatus::Modified || fts == FeatureStatus::Created)
           ft = src->GetModifiedFeature(fidIter->m_index);
         else

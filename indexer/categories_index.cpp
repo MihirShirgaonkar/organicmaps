@@ -11,7 +11,7 @@
 
 namespace
 {
-void AddAllNonemptySubstrings(base::MemTrie<string, base::VectorValues<uint32_t>> & trie,
+void AddAllNonemptySubstrings(base::MemTrie<std::string, base::VectorValues<uint32_t>> & trie,
                               std::string const & s, uint32_t value)
 {
   ASSERT(!s.empty(), ());
@@ -29,14 +29,14 @@ void AddAllNonemptySubstrings(base::MemTrie<string, base::VectorValues<uint32_t>
 template <typename TF>
 void ForEachToken(std::string const & s, TF && fn)
 {
-  vector<strings::UniString> tokens;
+  std::vector<strings::UniString> tokens;
   SplitUniString(search::NormalizeAndSimplifyString(s), base::MakeBackInsertFunctor(tokens),
                  search::Delimiters());
   for (auto const & token : tokens)
     fn(strings::ToUtf8(token));
 }
 
-void TokenizeAndAddAllSubstrings(base::MemTrie<string, base::VectorValues<uint32_t>> & trie,
+void TokenizeAndAddAllSubstrings(base::MemTrie<std::string, base::VectorValues<uint32_t>> & trie,
                                  std::string const & s, uint32_t value)
 {
   auto fn = [&](std::string const & token)
@@ -105,10 +105,10 @@ void CategoriesIndex::GetAssociatedTypes(std::string const & query, std::vector<
 {
   bool first = true;
   std::set<uint32_t> intersection;
-  auto processToken = [&](string const & token)
+  auto processToken = [&](std::string const & token)
   {
     std::set<uint32_t> types;
-    auto fn = [&](string const &, uint32_t type)
+    auto fn = [&](std::string const &, uint32_t type)
     {
       types.insert(type);
     };

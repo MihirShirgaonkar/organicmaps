@@ -16,9 +16,9 @@
 #include <sstream>
 #include <vector>
 
-using namespace feature;
-using namespace std;
-using namespace std::placeholders;
+// using namespace feature;
+// using namespace std;
+// using namespace std::placeholders;
 
 ////////////////////////////////////////////////////////////////////////////////////
 // TypesHolder implementation
@@ -26,10 +26,11 @@ using namespace std::placeholders;
 
 namespace feature
 {
-template <class ContT> string TypesToString(ContT const & holder)
+template <class ContT>
+std::string TypesToString(ContT const & holder)
 {
   Classificator const & c = classif();
-  string s;
+  std::string s;
   for (uint32_t const type : holder)
     s += c.GetReadableObjectName(type) + " ";
   if (!s.empty())
@@ -114,7 +115,7 @@ private:
   {
     // Fill types that will be taken into account last,
     // when we have many types for POI.
-    vector<vector<string>> const types = {
+    std::vector<std::vector<std::string>> const types = {
         // 1-arity
         {"building"},
         {"building:part"},
@@ -158,8 +159,8 @@ private:
   bool IsIn1(uint32_t t) const { return std::binary_search(m_types1.begin(), m_types1.end(), t); }
   bool IsIn2(uint32_t t) const { return std::binary_search(m_types2.begin(), m_types2.end(), t); }
 
-  vector<uint32_t> m_types1;
-  vector<uint32_t> m_types2;
+  std::vector<uint32_t> m_types1;
+  std::vector<uint32_t> m_types2;
 };
 
 }  // namespace
@@ -206,9 +207,9 @@ void TypesHolder::SortBySpec()
   UselessTypesChecker::Instance().SortUselessToEnd(*this);
 }
 
-vector<string> TypesHolder::ToObjectNames() const
+std::vector<std::string> TypesHolder::ToObjectNames() const
 {
-  vector<string> result;
+  std::vector<std::string> result;
   for (auto const type : *this)
     result.push_back(classif().GetReadableObjectName(type));
   return result;
@@ -236,12 +237,12 @@ bool FeatureParamsBase::operator == (FeatureParamsBase const & rhs) const
 
 bool FeatureParamsBase::IsValid() const
 {
-  return layer >= LAYER_LOW && layer <= LAYER_HIGH;
+  return layer >= feature::LAYER_LOW && layer <= feature::LAYER_HIGH;
 }
 
-string FeatureParamsBase::DebugString() const
+std::string FeatureParamsBase::DebugString() const
 {
-  string const utf8name = DebugPrint(name);
+  std::string const utf8name = DebugPrint(name);
   return ((!utf8name.empty() ? "Name:" + utf8name : "") +
           (rank != 0 ? " Rank:" + DebugPrint(rank) : "") +
           (!house.IsEmpty() ? " House:" + house.Get() : "") +
@@ -256,7 +257,7 @@ bool FeatureParamsBase::IsEmptyNames() const
 namespace
 {
 
-bool IsDummyName(string_view s)
+bool IsDummyName(std::string_view s)
 {
   return s.empty();
 }
@@ -272,7 +273,7 @@ void FeatureParams::ClearName()
   name.Clear();
 }
 
-bool FeatureParams::AddName(string_view lang, string_view s)
+bool FeatureParams::AddName(std::string_view lang, std::string_view s)
 {
   if (IsDummyName(s))
     return false;
@@ -282,7 +283,7 @@ bool FeatureParams::AddName(string_view lang, string_view s)
   return true;
 }
 
-bool FeatureParams::AddHouseName(string const & s)
+bool FeatureParams::AddHouseName(std::string const & s)
 {
   if (IsDummyName(s) || name.FindString(s) != StringUtf8Multilang::kUnsupportedLanguageCode)
     return false;
@@ -295,11 +296,11 @@ bool FeatureParams::AddHouseName(string const & s)
   // Example: housename=16th Street, housenumber=34
   if (strings::is_number(s))
   {
-    string housename(house.Get());
+    std::string housename(house.Get());
     if (AddHouseNumber(s))
     {
       // Duplicating code to avoid changing the method header.
-      string_view dummy;
+      std::string_view dummy;
       if (!name.GetString(StringUtf8Multilang::kDefaultCode, dummy))
         name.AddString(StringUtf8Multilang::kDefaultCode, housename);
       return true;
@@ -307,7 +308,7 @@ bool FeatureParams::AddHouseName(string const & s)
   }
 
   // Add as a default name if we don't have it yet.
-  string_view dummy;
+  std::string_view dummy;
   if (!name.GetString(StringUtf8Multilang::kDefaultCode, dummy))
   {
     name.AddString(StringUtf8Multilang::kDefaultCode, s);
@@ -317,7 +318,7 @@ bool FeatureParams::AddHouseName(string const & s)
   return false;
 }
 
-bool FeatureParams::AddHouseNumber(string houseNumber)
+bool FeatureParams::AddHouseNumber(std::string houseNumber)
 {
   ASSERT(!houseNumber.empty(), ("This check should be done by the caller."));
   ASSERT_NOT_EQUAL(houseNumber.front(), ' ', ("Trim should be done by the caller."));
@@ -336,7 +337,7 @@ bool FeatureParams::AddHouseNumber(string houseNumber)
     ++i;
   houseNumber.erase(0, i);
 
-  if (any_of(houseNumber.cbegin(), houseNumber.cend(), IsDigit))
+  if (any_of(houseNumber.cbegin(), houseNumber.cend(), feature::IsDigit))
   {
     house.Set(houseNumber);
     return true;
@@ -346,6 +347,7 @@ bool FeatureParams::AddHouseNumber(string houseNumber)
 
 void FeatureParams::SetGeomType(feature::GeomType t)
 {
+  using namespace feature;
   switch (t)
   {
   case GeomType::Point: m_geomType = HeaderGeomType::Point; break;
@@ -357,6 +359,7 @@ void FeatureParams::SetGeomType(feature::GeomType t)
 
 void FeatureParams::SetGeomTypePointEx()
 {
+  using feature::HeaderGeomType;
   ASSERT(m_geomType == HeaderGeomType::Point ||
          m_geomType == HeaderGeomType::PointEx, ());
   ASSERT(!house.IsEmpty(), ());
@@ -367,6 +370,7 @@ void FeatureParams::SetGeomTypePointEx()
 feature::GeomType FeatureParams::GetGeomType() const
 {
   CHECK(IsValid(), ());
+  using namespace feature;
   switch (*m_geomType)
   {
   case HeaderGeomType::Line: return GeomType::Line;
@@ -375,7 +379,7 @@ feature::GeomType FeatureParams::GetGeomType() const
   }
 }
 
-HeaderGeomType FeatureParams::GetHeaderGeomType() const
+feature::HeaderGeomType FeatureParams::GetHeaderGeomType() const
 {
   CHECK(IsValid(), ());
   return *m_geomType;
@@ -404,13 +408,13 @@ bool FeatureParams::FinishAddingTypes()
 {
   base::SortUnique(m_types);
 
-  if (m_types.size() > kMaxTypesCount)
+  if (m_types.size() > feature::kMaxTypesCount)
   {
     UselessTypesChecker::Instance().SortUselessToEnd(m_types);
 
-    LOG(LWARNING, ("Exceeded max types count:", TypesToString(m_types)));
+    LOG(LWARNING, ("Exceeded max types count:", feature::TypesToString(m_types)));
 
-    m_types.resize(kMaxTypesCount);
+    m_types.resize(feature::kMaxTypesCount);
     sort(m_types.begin(), m_types.end());
   }
 
@@ -468,7 +472,7 @@ uint32_t FeatureParams::FindType(uint32_t comp, uint8_t level) const
 
 bool FeatureParams::IsValid() const
 {
-  if (m_types.empty() || m_types.size() > kMaxTypesCount || !m_geomType)
+  if (m_types.empty() || m_types.size() > feature::kMaxTypesCount || !m_geomType)
     return false;
 
   return FeatureParamsBase::IsValid();
@@ -489,28 +493,27 @@ uint32_t FeatureParams::GetTypeForIndex(uint32_t i)
   return classif().GetTypeForIndex(i);
 }
 
-void FeatureBuilderParams::AddStreet(string s)
+void FeatureBuilderParams::AddStreet(std::string s)
 {
   // Replace \n with spaces because we write addresses to txt file.
   replace(s.begin(), s.end(), '\n', ' ');
 
-  m_addrTags.Add(AddressData::Type::Street, s);
+  m_addrTags.Add(feature::AddressData::Type::Street, s);
 }
 
-void FeatureBuilderParams::AddPostcode(string const & s)
+void FeatureBuilderParams::AddPostcode(std::string const & s)
 {
-  m_addrTags.Add(AddressData::Type::Postcode, s);
+  m_addrTags.Add(feature::AddressData::Type::Postcode, s);
 }
 
-string DebugPrint(FeatureParams const & p)
+std::string DebugPrint(FeatureParams const & p)
 {
-  string res = "Types: " + TypesToString(p.m_types) + "; ";
-  return (res + p.DebugString());
+  return "Types: " + feature::TypesToString(p.m_types) + "; " + p.DebugString();
 }
 
-string DebugPrint(FeatureBuilderParams const & p)
+std::string DebugPrint(FeatureBuilderParams const & p)
 {
-  ostringstream oss;
+  std::ostringstream oss;
   oss << "ReversedGeometry: " << (p.GetReversedGeometry() ? "true" : "false") << "; ";
   oss << DebugPrint(p.GetMetadata()) << "; ";
   oss << DebugPrint(p.GetAddressData()) << "; ";

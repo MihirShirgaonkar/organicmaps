@@ -33,7 +33,7 @@ public:
     m2::RectD cellRect;
     {
       // Check for limit rect intersection.
-      pair<uint32_t, uint32_t> const xy = cell.XY();
+      std::pair<uint32_t, uint32_t> const xy = cell.XY();
       uint32_t const r = cell.Radius();
       ASSERT_GREATER_OR_EQUAL(xy.first, r, ());
       ASSERT_GREATER_OR_EQUAL(xy.second, r, ());
@@ -129,7 +129,7 @@ std::vector<int64_t> CoverIntersection(FeatureIntersector<DEPTH_LEVELS> const & 
   if (fIsect.m_trg.empty() && fIsect.m_polyline.size() == 1)
   {
     m2::PointD const pt = fIsect.m_polyline[0];
-    return vector<int64_t>(
+    return std::vector<int64_t>(
         1, m2::CellId<DEPTH_LEVELS>::FromXY(static_cast<uint32_t>(pt.x),
                                             static_cast<uint32_t>(pt.y), DEPTH_LEVELS - 1)
                .ToInt64(cellDepth));
@@ -172,7 +172,7 @@ void SortAndMergeIntervals(Intervals v, Intervals & res)
     if (i == 0 || res.back().second < v[i].first)
       res.push_back(v[i]);
     else
-      res.back().second = max(res.back().second, v[i].second);
+      res.back().second = std::max(res.back().second, v[i].second);
   }
 }
 

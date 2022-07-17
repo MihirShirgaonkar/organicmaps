@@ -41,7 +41,7 @@ void LoadBytes(Source & src, Cont & cont)
 
 namespace feature
 {
-DataHeader::DataHeader(string const & fileName)
+DataHeader::DataHeader(std::string const & fileName)
   : DataHeader((FilesContainerR(GetPlatform().GetReader(fileName))))
 {
 }
@@ -79,11 +79,11 @@ std::pair<int, int> DataHeader::GetScaleRange() const
 
   switch (type)
   {
-  case MapType::World: return make_pair(low, worldH);
-  case MapType::WorldCoasts: return make_pair(low, high);
+  case MapType::World: return std::make_pair(low, worldH);
+  case MapType::WorldCoasts: return std::make_pair(low, high);
   default:
     ASSERT_EQUAL(type, MapType::Country, ());
-    return make_pair(worldH + 1, high);
+    return std::make_pair(worldH + 1, high);
 
     // Uncomment this to test countries drawing in all scales.
     //return make_pair(1, high);
@@ -136,7 +136,7 @@ void DataHeader::Load(ModelReaderPtr const & r, version::Format format)
   // Place all new serializable staff here.
 }
 
-string DebugPrint(DataHeader::MapType type)
+std::string DebugPrint(DataHeader::MapType type)
 {
   switch (type)
   {

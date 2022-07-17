@@ -71,7 +71,7 @@ struct XmlSection
   }
 
   FeatureStatus m_status = FeatureStatus::Untouched;
-  string m_sectionName;
+  std::string m_sectionName;
 };
 
 std::array<XmlSection, 4> const kXmlSections = {{{FeatureStatus::Deleted, kDeleteSection},

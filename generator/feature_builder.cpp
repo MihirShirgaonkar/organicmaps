@@ -291,7 +291,7 @@ void FeatureBuilder::RemoveUselessNames()
     if (types.RemoveIf(typeRemover))
     {
       // Remove only if there are no other text-style types in feature (e.g. highway).
-      pair<int, int> const range = GetDrawableScaleRangeForRules(types, RULE_ANY_TEXT);
+      std::pair<int, int> const range = GetDrawableScaleRangeForRules(types, RULE_ANY_TEXT);
       if (range.first == -1)
         m_params.name.Clear();
     }
@@ -311,7 +311,7 @@ void FeatureBuilder::RemoveNameIfInvisible(int minS, int maxS)
 {
   if (!m_params.name.IsEmpty() && !IsCoastCell())
   {
-    pair<int, int> const range = GetDrawableScaleRangeForRules(GetTypesHolder(), RULE_ANY_TEXT);
+    std::pair<int, int> const range = GetDrawableScaleRangeForRules(GetTypesHolder(), RULE_ANY_TEXT);
     if (range.first > maxS || range.second < minS)
       m_params.name.Clear();
   }
@@ -581,7 +581,7 @@ bool FeatureBuilder::AddName(std::string_view lang, std::string_view name)
 
 std::string_view FeatureBuilder::GetName(int8_t lang) const
 {
-  string_view sv;
+  std::string_view sv;
   CHECK(m_params.name.GetString(lang, sv) != sv.empty(), ());
   return sv;
 }
